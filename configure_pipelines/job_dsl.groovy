@@ -2,8 +2,8 @@
 // Note we can group these in a folder, for example "name: 'folder1/job1'".
 // We are also providing a path to the Jenkinsfiles.
 def pipelines = [
-    [name: 'job1', scriptPath: 'Hello_World/Jenkinsfile'],
-    [name: 'job2', scriptPath: 'Hello_World/Jenkinsfile']
+    [name: 'HelloWorld'      , scriptPath: 'Hello_World/Jenkinsfile'       ],
+    [name: 'HelloWorldDocker', scriptPath: 'Hello_World_Docker/Jenkinsfile']
 ]
 
 // Looping over the pipeline objects.
