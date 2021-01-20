@@ -5,7 +5,8 @@ def pipelines = [
     [name: 'HelloWorld',           scriptPath: 'Hello_World/Jenkinsfile'               ],
     [name: 'HelloWorldDocker',     scriptPath: 'Hello_World_Docker/Jenkinsfile'        ],
     [name: 'ConsoleAppDNC',        scriptPath: 'Console_App_DNC/Jenkinsfile'           ],
-	[name: 'PetClinicWebsiteJava', scriptPath: 'Pet_Clinic_Website_Java/Jenkinsfile'   ]
+	[name: 'PetClinic/PetClinicWebsiteJava', scriptPath: 'Pet_Clinic_Website_Java/Jenkinsfile'        ],
+    [name: 'Petclinic/PetClinicAgentImage', scriptPath: 'Pet_Clinic_Website_Java/Jenkinsfile.build'   ]
 ]
 
 // Looping over the pipeline objects.
