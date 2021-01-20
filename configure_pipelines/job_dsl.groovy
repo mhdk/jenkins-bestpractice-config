@@ -1,6 +1,6 @@
 // This array contains folders which will group together the different jobs.
 def folders = [
-	[name: 'PetClinic', description: 'A folder to gorup PetClinic pipelines.']
+    [name: 'PetClinic', description: 'A folder to gorup PetClinic pipelines.']
 ]
 
 // This array contains information about the pipelines we wish to be created.
@@ -10,8 +10,8 @@ def pipelines = [
     [name: 'HelloWorld',           scriptPath: 'Hello_World/Jenkinsfile'               ],
     [name: 'HelloWorldDocker',     scriptPath: 'Hello_World_Docker/Jenkinsfile'        ],
     [name: 'ConsoleAppDNC',        scriptPath: 'Console_App_DNC/Jenkinsfile'           ],
-	[name: 'PetClinicWebsiteJava', scriptPath: 'Pet_Clinic_Website_Java/Jenkinsfile'        ],
-    [name: 'PetClinicAgentImage', scriptPath: 'Pet_Clinic_Website_Java/Jenkinsfile.build'   ]
+    [name: 'PetClinic/PetClinicWebsiteJava', scriptPath: 'Pet_Clinic_Website_Java/Jenkinsfile'        ],
+    [name: 'PetClinic/PetClinicAgentImage', scriptPath: 'Pet_Clinic_Website_Java/Jenkinsfile.build'   ]
 ]
 
 // Looping over the folder array and creating folders specified.
