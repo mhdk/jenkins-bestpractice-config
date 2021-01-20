@@ -1,7 +1,7 @@
 // This array contains folders which will group together the different jobs.
-// def folders = [
-// 	[name: 'PetClinic', description: 'A folder to gorup PetClinic pipelines.']
-// ]
+def folders = [
+	[name: 'PetClinic', description: 'A folder to gorup PetClinic pipelines.']
+]
 
 // This array contains information about the pipelines we wish to be created.
 // Note we can group these in a folder, for example "name: 'folder1/job1'".
@@ -14,16 +14,15 @@ def pipelines = [
     [name: 'PetClinicAgentImage', scriptPath: 'Pet_Clinic_Website_Java/Jenkinsfile.build'   ]
 ]
 
-// // Looping over the folder array and creating folders specified.
-// for (f in folders) 
-// {
-// 	folder("${f.name}")
-// 	{
-// 		displayName("${f.name}")
-// 		description("${f.description}")
-// 	}
-// }
-
+// Looping over the folder array and creating folders specified.
+for (f in folders) 
+{
+	folder("${f.name}")
+	{
+		displayName("${f.name}")
+		description("${f.description}")
+	}
+}
 
 // Looping over the pipeline objects.
 for(p in pipelines) 
