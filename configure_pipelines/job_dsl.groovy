@@ -8,7 +8,8 @@ def folders = [
 // We are also providing a path to the Jenkinsfiles.
 def pipelines = [
     [name: 'HelloWorld',           scriptPath: 'Hello_World/Jenkinsfile'               ],
-    [name: 'HelloWorldDocker',     scriptPath: 'Hello_World_Docker/Jenkinsfile'        ],
+    [name: 'HelloWorldDocker',     scriptPath: 'Hello_World/Jenkinsfile.docker'        ],
+	[name: 'HelloWorldKubernetes', scriptPath: 'Hello_World/Jenkinsfile.k8s'           ],
     [name: 'ConsoleAppDNC',        scriptPath: 'Console_App_DNC/Jenkinsfile'           ],
     [name: 'PetClinic/PetClinicWebsiteJava', scriptPath: 'Pet_Clinic_Website_Java/Jenkinsfile'        ],
     [name: 'PetClinic/PetClinicAgentImage', scriptPath: 'Pet_Clinic_Website_Java/Jenkinsfile.build'   ]
