@@ -85,11 +85,7 @@ for(m in multibranchPipelines)
 			git
 			{
 				id("${m.name}") // IMPORTANT: use a constant and unique identifier
-				remote
-				{
-					name('github')
-					url('https://github.com/whayward-stfc/jenkins-test-applications.git')
-				}
+				remote('https://github.com/whayward-stfc/jenkins-test-applications.git')
 				includes('*')
 				extensions
 				{
