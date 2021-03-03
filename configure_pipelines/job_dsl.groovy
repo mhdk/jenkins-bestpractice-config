@@ -87,15 +87,6 @@ for(m in multibranchPipelines)
 				id("${m.name}") // IMPORTANT: use a constant and unique identifier
 				remote('https://github.com/whayward-stfc/jenkins-test-applications.git')
 				includes('*')
-				extensions
-				{
-					cloneOptions
-					{
-						shallow(true)
-						depth(1)
-						noTags(true)
-					}
-				}
 			}
 		}
 		factory
