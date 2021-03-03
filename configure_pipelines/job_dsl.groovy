@@ -15,8 +15,12 @@ def pipelines = [
     [name: 'PetClinic/PetClinicAgentImage', scriptPath: 'Pet_Clinic_Website_Java/Jenkinsfile.build'   ]
 ]
 
+def multibranchPipelines = [
+	[name: 'PetClinic/PetClinicWebsiteMultibranch', scriptPath: 'Pet_Clinic_Website_Java/Jenkinsfile']
+]
+
 // Looping over the folder array and creating folders specified.
-for (f in folders) 
+for (f in folders)
 {
 	folder("${f.name}")
 	{
@@ -26,31 +30,31 @@ for (f in folders)
 }
 
 // Looping over the pipeline objects.
-for(p in pipelines) 
+for(p in pipelines)
 {
-	
+
 	// creating a job from the name property of the pipeline object.
-	pipelineJob("${p.name}") 
+	pipelineJob("${p.name}")
 	{
-	    definition 
+	    definition
 		{
-	        cpsScm 
+	        cpsScm
 			{
-	            scm 
+	            scm
 				{
 	                // Specifying the github repo we want to find our Jenkinsfiles.
-					git 
+					git
 					{
-	                  remote 
+	                  remote
 					  {
 	                    name('github')
 	                    url('https://github.com/whayward-stfc/jenkins-test-applications.git')
 	                  }
 	                  branch('master')
 	                  // Specifying additional options that we would usually set in the UI.
-					  extensions 
+					  extensions
 					  {
-	                  	cloneOptions 
+	                  	cloneOptions
 						{
 	                  	  shallow(true)
 	                  	  depth(1)
@@ -64,9 +68,54 @@ for(p in pipelines)
 	        }
 	    }
 	    // This trigger runs the job once per day.
-		triggers 
+		triggers
 		{
 	        cron('H H(1-8) * * *')
 	    }
 	}
 }
+
+// Looping over the pipeline objects.
+for(m in multibranchPipelines)
+{
+	multibranchPipelineJob('example')
+	{
+		branchSources
+		{
+			git
+			{
+				id("${m.name}") // IMPORTANT: use a constant and unique identifier
+				remote
+				{
+					name('github')
+					url('https://github.com/whayward-stfc/jenkins-test-applications.git')
+				}
+				includes('*')
+				extensions
+				{
+					cloneOptions
+					{
+						shallow(true)
+						depth(1)
+						noTags(true)
+					}
+				}
+			}
+		}
+		factory
+		{
+			workflowBranchProjectFactory
+			{
+				scriptPath("${m.scriptPath}")
+			}
+		}
+		orphanedItemStrategy
+		{
+			discardOldItems
+			{
+				numToKeep(20)
+			}
+		}
+	}
+}
+
