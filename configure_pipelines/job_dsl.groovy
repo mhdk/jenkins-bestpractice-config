@@ -89,6 +89,15 @@ for(m in multibranchPipelines)
 				includes('*')
 			}
 		}
+		strategy
+		{
+			defaultBranchPropertyStrategy {
+				props {
+					// don't trigger builds automatically - for demo purposes.
+					noTriggerBranchProperty()
+				}
+			}
+		}
 		factory
 		{
 			workflowBranchProjectFactory
