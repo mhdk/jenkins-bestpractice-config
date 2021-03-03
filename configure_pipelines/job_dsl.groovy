@@ -84,24 +84,28 @@ for(m in multibranchPipelines)
 		{
 			branchSource
 			{
-				git
+				source
 				{
-					id("${m.name}") // IMPORTANT: use a constant and unique identifier
-					remote('https://github.com/whayward-stfc/jenkins-test-applications.git')
-					includes('*')
-				}
-			}
-			strategy
-			{
-				defaultBranchPropertyStrategy
-				{
-					props
+					git
 					{
-						// don't trigger builds automatically - for demo purposes.
-						noTriggerBranchProperty()
+						id("${m.name}") // IMPORTANT: use a constant and unique identifier
+						remote('https://github.com/whayward-stfc/jenkins-test-applications.git')
+						includes('*')
+					}
+				}
+				strategy
+				{
+					defaultBranchPropertyStrategy
+					{
+						props
+						{
+							// don't trigger builds automatically - for demo purposes.
+							noTriggerBranchProperty()
+						}
 					}
 				}
 			}
+
 		}
 		factory
 		{
