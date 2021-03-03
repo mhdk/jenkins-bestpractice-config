@@ -88,15 +88,15 @@ for(m in multibranchPipelines)
 				remote('https://github.com/whayward-stfc/jenkins-test-applications.git')
 				includes('*')
 			}
-		}
-		strategy
-		{
-			defaultBranchPropertyStrategy
+			strategy
 			{
-				props
+				defaultBranchPropertyStrategy
 				{
-					// don't trigger builds automatically - for demo purposes.
-					noTriggerBranchProperty()
+					props
+					{
+						// don't trigger builds automatically - for demo purposes.
+						noTriggerBranchProperty()
+					}
 				}
 			}
 		}
