@@ -91,8 +91,10 @@ for(m in multibranchPipelines)
 		}
 		strategy
 		{
-			defaultBranchPropertyStrategy {
-				props {
+			defaultBranchPropertyStrategy
+			{
+				props
+				{
 					// don't trigger builds automatically - for demo purposes.
 					noTriggerBranchProperty()
 				}
