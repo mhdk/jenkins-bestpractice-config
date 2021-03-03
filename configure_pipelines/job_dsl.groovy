@@ -90,6 +90,11 @@ for(m in multibranchPipelines)
 					{
 						id "${m.name}" // IMPORTANT: use a constant and unique identifier
 						remote 'https://github.com/whayward-stfc/jenkins-test-applications.git'
+						traits
+						{
+							gitBranchDiscovery()
+							// gitTagDiscovery() // if you need tag discovery
+						}
 					}
 				}
 				strategy
