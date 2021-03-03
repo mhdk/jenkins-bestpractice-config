@@ -82,11 +82,14 @@ for(m in multibranchPipelines)
 	{
 		branchSources
 		{
-			git
+			branchSource
 			{
-				id("${m.name}") // IMPORTANT: use a constant and unique identifier
-				remote('https://github.com/whayward-stfc/jenkins-test-applications.git')
-				includes('*')
+				git
+				{
+					id("${m.name}") // IMPORTANT: use a constant and unique identifier
+					remote('https://github.com/whayward-stfc/jenkins-test-applications.git')
+					includes('*')
+				}
 			}
 			strategy
 			{
