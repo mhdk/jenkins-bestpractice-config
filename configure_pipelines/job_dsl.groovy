@@ -78,7 +78,7 @@ for(p in pipelines)
 // Looping over the pipeline objects.
 for(m in multibranchPipelines)
 {
-	multibranchPipelineJob('example')
+	multibranchPipelineJob("${m.name}")
 	{
 		branchSources
 		{
