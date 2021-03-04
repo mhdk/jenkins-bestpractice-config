@@ -1,3 +1,5 @@
+#!/usr/bin/env groovy
+
 // Note we have changed from echo to writeline statements for writing to a file.
 
 import groovy.io.FileType;
