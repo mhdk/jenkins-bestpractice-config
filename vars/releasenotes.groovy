@@ -18,7 +18,8 @@ def call(Map config=[:])
         writer ->
             // list of file names and sizes (for files, no sizes for directories).
             dir.eachFileRecurse(FileType.ANY){ file ->
-                if (file.isDirectory()){
+                if (file.isDirectory())
+                {
                     writer.writeLine(file.name);
                 }
                 else
@@ -44,20 +45,24 @@ def call(Map config=[:])
         // assume not everyone wants our new features - all that some of our pipeline
         // builds are going to do is generate documentation. So, we wan't a file list but
         // not the SCM details.
-        if (config.changes != "false"){
+        if (config.changes != "false")
+        {
             // We are looping through each change set in the collection,
-            for (change in changeLogSets) {
+            for (change in changeLogSets)
+            {
 
                 // and getting the entries for each change-set.
                 def entries = change.items;
 
                 // Then we are looping through each item in the entry.
-                for (entry in entries) {
+                for (entry in entries)
+                {
                     // we are writing out the comit ID, author, timestamp and commit message.
                     writer.writeLine("${entry.commitId} by ${entry.author} on ${new Date(entry.timestamp)}: ${entry.msg}");
 
                     // Finally we are writing out the affected files.
-                    for (file in entry.affectedFiles) {
+                    for (file in entry.affectedFiles)
+                    {
                         writer.writeLine("${file.editType.name} ${file.path}");
                     }
                 }
