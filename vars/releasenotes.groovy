@@ -13,6 +13,8 @@ def call() //Map config=[:]
 {
     def dir = new File(pwd());
 
+    println("can you see this simplenotes?")
+
     new File(dir.path + '/releasenotes.txt').withWriter('utf-8')
     {
         writer ->
