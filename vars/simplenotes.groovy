@@ -8,7 +8,7 @@ import java.io.*;
 // @NonCPS
 def call() //Map config=[:]
 {
-    def dir = new File(pwd());
+    def dir = new File("/home/jenkins/workspace/ConsoleAppDNC/Console_App_DNC/ConsoleApp1");
 
     new File(dir.path + '/releasenotes.txt').withWriter('utf-8')
     {
