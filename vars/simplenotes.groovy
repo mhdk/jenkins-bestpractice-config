@@ -15,7 +15,9 @@ def call() //Map config=[:]
 
     println("can you see this 2?")
 
-    def releasefile = new File(dir.path + '/releasenotes.txt')
+    new File(dir.path + '/releasenotes.txt').withWriter('utf-8') {
+         writer -> writer.writeLine 'Hello World'
+    }
 
     // new File(releasefile.path).withWriter('utf-8')
     // {
