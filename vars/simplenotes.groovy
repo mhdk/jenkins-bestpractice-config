@@ -18,18 +18,18 @@ def call() //Map config=[:]
     def releasefile = new File(dir.path + '/releasenotes.txt')
 
     new File(releasefile.path).withWriter('utf-8')
-    // {
-    //     writer ->
-    //         // list of file names and sizes (for files, no sizes for directories).
-    //         dir.eachFileRecurse(FileType.ANY){ file ->
-    //             if (file.isDirectory())
-    //             {
-    //                 writer.writeLine(file.name);
-    //             }
-    //             else
-    //             {
-    //                 writer.writeLine('\t' + file.name + '\t' + file.length());
-    //             }
-    //         }
-    // }
+    {
+        writer ->
+            // list of file names and sizes (for files, no sizes for directories).
+            dir.eachFileRecurse(FileType.ANY){ file ->
+                if (file.isDirectory())
+                {
+                    writer.writeLine(file.name);
+                }
+                else
+                {
+                    writer.writeLine('\t' + file.name + '\t' + file.length());
+                }
+            }
+    }
 }
