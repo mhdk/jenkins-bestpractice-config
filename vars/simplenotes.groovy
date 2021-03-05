@@ -11,7 +11,7 @@ def call() //Map config=[:]
     println("can you see this?")
     print(pwd())
 
-    def dir = new File("/home/jenkins/workspace/ConsoleAppDNC/Console_App_DNC/ConsoleApp1");
+    def dir = new File(pwd());
 
     println("can you see this 2?")
 
