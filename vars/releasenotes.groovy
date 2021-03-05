@@ -9,7 +9,7 @@ import java.text.SimpleDateFormat
 import hudson.model.*
 
 @NonCPS
-def call(Map config=[:])
+def call() //Map config=[:]
 {
     def dir = new File(pwd());
 
