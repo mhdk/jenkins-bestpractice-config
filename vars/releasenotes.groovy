@@ -16,6 +16,16 @@ def call(Map config=[:])
     new File(dir.path + '/releasenotes.txt').withWriter('utf-8')
     {
         writer ->
+            // list of file names and sizes (for files, no sizes for directories).
+            dir.eachFileRecurse(FileType.ANY){ file ->
+                if (file.isDirectory()){
+                    writer.writeLine(file.name);
+                }
+                else
+                {
+                    writer.writeLine('\t' + file.name + '\t' + file.length());
+                }
+            }
 
         // Getting the date and time with simple code and echoing it to the console.
         def now = new Date();
@@ -28,13 +38,13 @@ def call(Map config=[:])
         // variable here.
         writer.writeLine("Build Number is: ${BUILD_NUMBER}");
 
+        // Getting the change-sets associated with our current build.
+        def changeLogSets = currentBuild.changeSets;
+
         // assume not everyone wants our new features - all that some of our pipeline
         // builds are going to do is generate documentation. So, we wan't a file list but
         // not the SCM details.
         if (config.changes != "false"){
-            // Getting the change-sets associated with our current build.
-            def changeLogSets = currentBuild.changeSets;
-
             // We are looping through each change set in the collection,
             for (change in changeLogSets) {
 
@@ -51,17 +61,6 @@ def call(Map config=[:])
                         writer.writeLine("${file.editType.name} ${file.path}");
                     }
                 }
-            }
-        }
-
-        // list of file names and sizes (for files, no sizes for directories).
-        dir.eachFileRecurse(FileType.ANY){ file ->
-            if (file.isDirectory()){
-                writer.writeLine(file.name);
-            }
-            else
-            {
-                writer.writeLine('\t' + file.name + '\t' + file.length());
             }
         }
     }
