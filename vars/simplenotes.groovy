@@ -12,6 +12,8 @@ def call() //Map config=[:]
 
     def dir = new File("/home/jenkins/workspace/ConsoleAppDNC/Console_App_DNC/ConsoleApp1");
 
+    println( dir )
+
     new File(dir.path + '/releasenotes.txt').withWriter('utf-8')
     {
         writer ->
