@@ -8,7 +8,7 @@ import java.util.Calendar.*;
 import java.text.SimpleDateFormat
 import hudson.model.*
 
-@NonCPS
+// @NonCPS
 def call() //Map config=[:]
 {
     def dir = new File(pwd());
