@@ -1,0 +1,45 @@
+apiVersion: v1
+# The service will define how jenkins receives traffic.
+kind: Service
+metadata:
+  name: jenkins
+  labels:
+    app: jenkins
+spec:
+  type: ClusterIP
+  ports:
+    # We have one port for the UI
+    - name: ui
+      port: 8080
+      targetPort: 8080
+      protocol: TCP
+    # So we can use 'jenkinsTunnel: jenkins:50000'
+    - name: slave
+      port: 50000
+      protocol: TCP
+    # So we can use 'jenkinsUrl: "http://jenkins/"'
+    - name: http
+      port: 80
+      targetPort: 8080
+  selector:
+    app: jenkins
+# spec:
+#   type: LoadBalancer # was clusterIP
+#   ports:
+#     # We have one port for the UI
+#     - name: ui
+#       port: 8080
+#       targetPort: 8080
+#       nodePort: 32323  # this port wasnt here when clusterIP.... note that this creates random ports for the agent nodes.
+#                        # **** maybe create separate services for these, if best practice??
+#       protocol: TCP
+#     # So we can use 'jenkinsTunnel: jenkins:50000'
+#     - name: slave
+#       port: 50000
+#       protocol: TCP
+#     # So we can use 'jenkinsUrl: "http://jenkins/"'
+#     - name: http
+#       port: 80
+#       targetPort: 8080
+#   selector:
+#     app: jenkins

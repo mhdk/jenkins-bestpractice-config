@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jenkins
+  labels:
+    app: jenkins
+# Specification for deployment.
+spec:
+  selector:
+    matchLabels:
+      app: jenkins
+  replicas: 1
+  strategy:
+    # RollingUpdate Deployments support running multiple versions of an application at the same time
+    type: RollingUpdate
+    rollingUpdate:
+      # Maximum number of Pods that can be created over the desired number of Pods
+      maxSurge: 1
+      maxUnavailable: 0
+  # Blueprint ("template") for the pods.
+  template:
+    metadata:
+      labels:
+        app: jenkins
+    spec:
+      # Provides an identity for processes that run in a Pod
+      serviceAccountName: jenkins
+      containers:
+      - name: jenkins
+        # Using jenkins image from local repository. Needed to add the Repo IP to
+        # "Insecure Repositories" in "~/.minikube/machines/<PROFILE_NAME>/config.json".
+        image: 192.168.1.157:31320/jenkins-docker-casc:v1 #jenkins/jenkins:lts-alpine
+        imagePullPolicy: Always #IfNotPresent
+        env:
+        - name: JAVA_OPTS
+        # spawn an executor for each build in queue immediately without waiting,
+        # you can use these flags during Jenkins startup. Test this as this may result in
+        # having too many executors. By default jenkins uses executors conservatively
+          value: -Xmx2048m -Dhudson.slaves.NodeProvisioner.MARGIN=50 -Dhudson.slaves.NodeProvisioner.MARGIN0=0.85 -Djenkins.install.runSetupWizard=false -Dhudson.slaves.NodeProvisioner.initialDelay=0
+        # Setting the location of the casc config file.
+        - name: CASC_JENKINS_CONFIG
+          value: /var/jenkins_home/casc.yaml
+        # Get these from a secret
+        - name: ADMIN_ID
+          value: "admin"
+        - name: ADMIN_PWD
+          value: "123"
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        - containerPort: 50000
+          protocol: TCP
+          ######
+          ### Here we could define resource limits "resources:\n\tlinits:".
+          ######
+        # This is where jenkins will persist its files. So, K8s will use our PV to
+        # mount into "/var/jenkins_home" so the files are persisted when we shut down jenkins.
+        # These files will be stored on the host at the location we have specified in our PVC.
+        volumeMounts: ####### could also include docker sock and runtime here ?????????
+        # - name: jenkins
+        #   mountPath: /var/jenkins_home
+        # Volume mount with volume that references the config file.
+        - name: config-volume
+          mountPath: /var/jenkins_home/casc.yaml
+          subPath: casc.yaml
+
+        # Good idea to have plugins built into custom docker image - that way we have history of images and can roll
+        # back to last working one.
+        # ***** can mount plugins here but default behaviour is to shut down after command.
+        # - name: config-volume
+        #   mountPath: /usr/share/jenkins/ref/plugins/plugins.txt
+        #   subPath: plugins.txt
+        # command: ["/bin/sh", "-c", "/usr/local/bin/install-plugins.sh < /usr/share/jenkins/ref/plugins/plugins.txt"]   ### testing
+
+      restartPolicy: Always
+      securityContext:
+        # For any Containers in the Pod, all processes run with user ID below.
+        runAsUser: 0
+      terminationGracePeriodSeconds: 30
+      # The persistent volume claim that the pod will use to allocate storage.
+      volumes:
+      # - name: jenkins
+      #   persistentVolumeClaim:
+      #     claimName: jenkins-claim
+      # volume that contains our casc config file.
+      - name: config-volume
+        configMap:
+          name: jenkins-configmap
+      # - name: plugins-install
+      #   configMap:
+      #     name: jenkins-configmap

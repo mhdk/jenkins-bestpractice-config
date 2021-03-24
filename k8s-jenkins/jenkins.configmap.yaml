@@ -1,0 +1,380 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jenkins-configmap
+# data - key-value pair, the same construct we had for the secrets.
+data:
+  plugins.txt: |
+    ant:latest
+    antisamy-markup-formatter:latest
+    authorize-project:latest
+    blueocean:latest
+    build-timeout:latest
+    cloudbees-folder:latest
+    configuration-as-code:latest
+    credentials-binding:latest
+    docker-plugin:latest
+    docker-workflow:latest
+    email-ext:latest
+    git:latest
+    github-branch-source:latest
+    gradle:latest
+    job-dsl:latest
+    ldap:latest
+    mailer:latest
+    matrix-auth:latest
+    pam-auth:latest
+    pipeline-github-lib:latest
+    pipeline-stage-view:latest
+    ssh-slaves:latest
+    timestamper:latest
+    workflow-aggregator:latest
+    ws-cleanup:latest
+
+  casc.yaml: |
+    ######################################################################################
+    # This file is used as part of the jenkins "configuration as code" plugin.
+    #
+    # Valid properties aer determined by the plugins that are installed.
+    # For example, the "jenkins.authorizationStrategy.globalMatrix.permissions"
+    # property would be valid only if the plugin "Matrix Authorization Strategy"
+    # is installed.
+    #
+    # Reference for available properties can be found here:
+    # "<jenkins_host>:8080/configuration-as-code/reference"
+    # This is a page customised to your particular jenkins installation.
+    #
+    # Note we can also use the Job DSL plugin to define projects/jobs as code. We can
+    # even include Job DSL code inside JCasC config files and have the jobs and projects
+    # configured as part of the configuration process.
+    #######################################################################################
+
+    # Setting up a password based authentication scheme with a new user named
+    # "admin". The variables in this block are environment variables that need
+    # to be passed in via the run command, or similar.
+    jenkins:
+      securityRealm:
+        local:
+          allowsSignup: false
+          users:
+          - id: "${ADMIN_ID}"
+            password: "${ADMIN_PWD}"
+
+      # The Matrix Authorization Strategy Plugin allows us to use
+      # jenkins.authorizationStrategy.globalMatrix.permissions to set global
+      # permissions. Global permissions refer to permissions with a greater
+      # scope than for example 'per-project' permissions.
+      #
+      # Here we are granting "Overall/Administer" to a user named "admin" and
+      # "Overall/Read" to "authenticated" which is a special role that represents
+      # all authenticated users.
+      #
+      # These are of the format:
+      # <permission-group>/<permission-name>:<role>
+      #
+      # Note there is also a role "anonymous" wich refers to non-authenticated
+      # users. By default they have no permissions.
+      authorizationStrategy:
+        globalMatrix:
+          permissions:
+            - "Overall/Administer:admin"
+            - "Overall/Read:authenticated"
+
+      # Here we enable Agent to Controller Access Control. Without this the agent
+      # would be able to instruct the controller (i.e. the primary node) to execute
+      # any action it requests, which may be undesirable. By enabling this we can
+      # control which commands and files the agents have access to.
+      remotingSecurity:
+        enabled: true
+
+      # Configuring kubernetes/docker as a cloud for Jenkins to use. This means that it can
+      # use the docker API on the host to provision containers as build agents.
+      clouds:
+        - kubernetes:
+            name: "kubernetes"
+            serverUrl: "https://192.168.1.157:8443"
+            namespace: "jenkins"
+            # This and below are refering to the service name 'jenkins'.
+            jenkinsUrl: "http://jenkins/"
+            # don't need to specify tunnel when using inbout agent image.
+            #jenkinsTunnel: jenkins:50000
+            connectTimeout: 5
+            readTimeout: 15
+            containerCapStr: 10
+            maxRequestsPerHostStr: 32
+            retentionTimeout: 600
+            templates:
+              - name: "kubernetes-agent"
+                namespace: "jenkins"
+                label: "kubernetes-agent"
+                nodeUsageMode: EXCLUSIVE
+                containers:
+                  # replace the default JNLP agent
+                  - name: "jnlp"
+                    image: "jenkins/inbound-agent:latest" # "jenkins/jnlp-slave:latest"
+                    alwaysPullImage: true
+                    workingDir: "/home/jenkins"
+                    ttyEnabled: true
+                    resourceRequestCpu: "500m"
+                    resourceLimitCpu: "1000m"
+                    resourceRequestMemory: "1Gi"
+                    resourceLimitMemory: "2Gi"
+
+                  # Docker commands are run as root user and group.
+                  - name: docker
+                    image: docker:latest
+                    alwaysPullImage: true
+                    workingDir: "/home/jenkins"
+                    ttyEnabled: true
+                volumes:
+                # emptyDir are volumes that get created empty when a Pod is created
+                  - emptyDirVolume:
+                      memory: false
+                      mountPath: "/tmp"
+                  - hostPathVolume:
+                      mountPath: "/var/run/docker.sock"
+                      hostPath: "/var/run/docker.sock"
+                  # - hostPathVolume:
+                  #     mountPath: "/usr/local/bin/docker"
+                  #     hostPath: "/usr/local/bin/docker"
+                #
+                idleMinutes: "0"
+                activeDeadlineSeconds: "360"
+                slaveConnectTimeout: "1000"
+
+              - name: "kubernetes-agent-dnc"
+                namespace: "jenkins"
+                label: "kubernetes-agent-dnc"
+                nodeUsageMode: EXCLUSIVE
+                containers:
+                  - name: "jnlp"
+                    image: "192.168.1.157:31320/docker-agent-dnc:v1" #jenkins/inbound-agent:latest
+                    alwaysPullImage: true
+                    workingDir: "/home/jenkins"
+                    ttyEnabled: true
+                    resourceRequestCpu: "500m"
+                    resourceLimitCpu: "1000m"
+                    resourceRequestMemory: "1Gi"
+                    resourceLimitMemory: "2Gi"
+                volumes:
+                # emptyDir are volumes that get created empty when a Pod is created
+                  - emptyDirVolume:
+                      memory: false
+                      mountPath: "/tmp"
+                idleMinutes: "0"
+                activeDeadlineSeconds: "120"
+                slaveConnectTimeout: "1000"
+
+              - name: "kubernetes-agent-mavenjdk"
+                namespace: "jenkins"
+                label: "kubernetes-agent-mavenjdk"
+                nodeUsageMode: EXCLUSIVE
+                containers:
+                  - name: "jnlp"
+                    image: "192.168.1.157:31320/docker-agent-mavenjdk:v1"
+                    alwaysPullImage: true
+                    # This needs to be a path other than the jenkins home in the image
+                    # otherwise the mounting erases the local maven repo contents.
+                    workingDir: "/home/jenkins/agent"
+                    ttyEnabled: true
+                    # --- these are limites over the whole cluster. Below limits to about 2 pods.
+                    resourceRequestCpu: "500m"
+                    resourceLimitCpu: "1000m"
+                    resourceRequestMemory: "1Gi"
+                    resourceLimitMemory: "2Gi"
+                volumes:
+                # emptyDir are volumes that get created empty when a Pod is created
+                  - emptyDirVolume:
+                      memory: false
+                      mountPath: "/tmp"
+                idleMinutes: "0"
+                activeDeadlineSeconds: "240"
+                slaveConnectTimeout: "1000"
+
+        # - kubernetes:
+        #     name: "advanced-k8s-config"
+        #     serverUrl: "https://avanced-k8s-config:443"
+        #     skipTlsVerify: true
+        #     namespace: "default"
+        #     credentialsId: "advanced-k8s-credentials"
+        #     jenkinsUrl: "http://jenkins/"
+        #     connectTimeout: 0
+        #     readTimeout: 0
+        #     containerCapStr: 100
+        #     maxRequestsPerHostStr: 64
+        #     retentionTimeout: 5
+        #     templates:
+        #       - name: "k8s-agent"
+        #         namespace: "default"
+        #         label: "linux-x86_64"
+        #         nodeUsageMode: EXCLUSIVE
+        #         containers:
+        #           - name: "jnlp"
+        #             image: "jenkins/inbound-agent:latest"
+        #             alwaysPullImage: true
+        #             workingDir: "/home/jenkins"
+        #             ttyEnabled: true
+        #             resourceRequestCpu: "500m"
+        #             resourceLimitCpu: "1000m"
+        #             resourceRequestMemory: "1Gi"
+        #             resourceLimitMemory: "2Gi"
+        #         volumes:
+        #           - emptyDirVolume:
+        #               memory: false
+        #               mountPath: "/tmp"
+        #         idleMinutes: "1"
+        #         activeDeadlineSeconds: "120"
+        #         slaveConnectTimeout: "1000"
+
+        - docker:
+            name: "docker-agent"
+            exposeDockerHost: true
+            dockerApi:
+              dockerHost:
+                # This is where the docker API is exposed on the host.
+                uri: "tcp://host.docker.internal:2375"
+            templates:
+              # Label that will be used to specify which job runs on this type of agent.
+              - labelString: "docker"
+                dockerTemplateBase:
+                  image: "jenkins/jenkins:lts"
+                  # attaching volumes to use docker inside this docker provisioned agent.
+                  volumes:
+                    - //var/run/docker.sock:/var/run/docker.sock
+                    - //usr/local/bin/docker:/usr/local/bin/docker
+                # Root file directory on the container agent.
+                remoteFs: "/var/jenkins_home"
+                connector:
+                  attach:
+                    user: "jenkins"
+                instanceCapStr: "10"
+                retentionStrategy:
+                  idleMinutes: 1
+
+              - labelString: "docker-dotnetcore"
+                dockerTemplateBase:
+                  # Note that to enable use of a local registry you need to add the
+                  # registry to the docker "daemon.json" file, as below:
+                  # insecure-registries": ["192.168.1.172:5000"]
+                  image: "192.168.1.172:5000/docker-agent-dnc:v1"
+                # Root file directory on the container agent.
+                remoteFs: "/var/jenkins_home"
+                connector:
+                  attach:
+                    user: "jenkins"
+                instanceCapStr: "10"
+                retentionStrategy:
+                  idleMinutes: 1
+
+              - labelString: "docker-mavenjdk"
+                dockerTemplateBase:
+                  image: "192.168.1.172:5000/docker-agent-mavenjdk:v1"
+                  # # Add volume for maven dependencies, which could be added by a jenkins
+                  # # job to download them preiodically?
+                  # volumes:
+                  #   - /.......:/var/jenkins_home/.m2/repository ?????
+                # Root file directory on the container agent.
+                remoteFs: "/var/jenkins_home"
+                connector:
+                  attach:
+                    user: "jenkins"
+                instanceCapStr: "10"
+                retentionStrategy:
+                  idleMinutes: 1
+
+    # example jenkins cloud config for reference
+    # jenkins:
+    #   clouds:
+    #     - docker:
+    #         name: "docker"
+    #         dockerApi:
+    #           dockerHost:
+    #             uri: "unix:///var/run/docker.sock"
+    #         templates:
+    #           - labelString: "docker-agent"
+    #             dockerTemplateBase:
+    #               # TODO: pin sha256 or versions when using in production
+    #               image: "jenkins/agent"
+    #               volumes:
+    #                 - hello:/hello
+    #                 - world:/world
+    #               environmentsString: |
+    #                 hello=world
+    #                 foo=bar
+    #             remoteFs: "/home/jenkins/agent"
+    #             connector:
+    #               attach:
+    #                 user: "jenkins"
+    #             instanceCapStr: "10"
+    #             retentionStrategy:
+    #               idleMinutes: 1
+
+    # By default, Jenkins jobs are run as the system user which has a lot of
+    # system privilege and can therefore run mallicious jobs.
+    #
+    # Instead we set it so that jenkins jobs are run using the same Jenkins
+    # user that configured/triggered them. This uses the plugin
+    # "Authorize Project", and we use it to set the strategy accordingly.
+    security:
+      queueItemAuthenticator:
+        authenticators:
+        - global:
+            strategy: "triggeringUsersAuthorizationStrategy"
+
+
+    # unclassified.location.url is the parth for setting the Jenkins URL.
+    # When this is set we can go to "Dashboard -> Configure" menus in jenkins
+    # and we will see "http://server_ip:8080" in the "Jenkins URL" field.
+    unclassified:
+      location:
+        url: http://testjenkinsurl:8080/
+
+
+      globalLibraries:
+        libraries:
+          - defaultVersion: "master"
+            implicit: true
+            name: "my-library"
+            retriever:
+              modernSCM:
+                scm:
+                  git:
+                    id: "pipeline-shared-lib"
+                    remote: "https://github.com/whayward-stfc/jenkins-bestpractice-config.git"
+                    # credentialsId: "a-credential"
+                    traits:
+                      - "gitHubBranchDiscovery"
+                      - "gitHubTagDiscovery"
+                      - "pruneStaleBranchTrait"
+
+    # JobDSL definition of the seed-job, which creates jobs specified within
+    # a specified groovy script in source control. Jobs can be added or deleted
+    # by changing this groovy file. Now there is no need to back up the jobs,
+    # everything will be deployed with jenkins.
+    #
+    # The "Job DSL" groovy scripts will sit along side the other Jenkins
+    # setup files in the jenkins repository.
+    #
+    # ****** currently we have to approve each script... need to look at this ******
+    jobs:
+      - script: >
+          job('__seed') {
+              label('master')
+              scm {
+                  git {
+                      remote {
+                          url('https://github.com/whayward-stfc/jenkins-bestpractice-config')
+                      }
+                      branch('master')
+                  }
+              }
+              steps {
+                  dsl {
+                      lookupStrategy('SEED_JOB')
+                      external('configure_pipelines/job_dsl.groovy')
+                  }
+              }
+              triggers {
+                  scm('* * * * *')
+              }
+          }
