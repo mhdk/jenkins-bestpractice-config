@@ -16,7 +16,7 @@ spec:
     # Here we have just made up this host name and also not specified anywhere
     # which IP address this hostname should resolve to. This is something that you would
     # need to configure.
-    # Added to etc/hosts: "192.168.1.157 icd.devops.jenkins.com", where the IP is the
+    # Added to etc/hosts: "192.168.0.33 icd.devops.jenkins.com", where the IP is the
     # address of the ingress.
     - host: jenkins.icd.devops.com
       # http forwarding to the internal service.

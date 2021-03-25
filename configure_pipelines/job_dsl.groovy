@@ -48,7 +48,7 @@ for(p in pipelines)
 	                  remote
 					  {
 	                    name('github')
-	                    url('https://github.com/whayward-stfc/jenkins-test-applications.git')
+	                    url('https://github.com/mhdk/jenkins-test-applications.git')
 	                  }
 	                  branch('master')
 	                  // Specifying additional options that we would usually set in the UI.
@@ -89,7 +89,7 @@ for(m in multibranchPipelines)
 					git
 					{
 						id "${m.name}" // IMPORTANT: use a constant and unique identifier
-						remote 'https://github.com/whayward-stfc/jenkins-test-applications.git'
+						remote 'https://github.com/mhdk/jenkins-test-applications.git'
 						traits
 						{
 							gitBranchDiscovery()

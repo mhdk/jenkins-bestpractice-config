@@ -14,21 +14,21 @@ minikube service registry -n jenkins
 
 @REM Build and push the jenkins master node docker image to the registry, ready for
 @REM jenkins to pick it up.
-docker build -t 192.168.1.157:31320/jenkins-docker-casc:v1 .
-docker push 192.168.1.157:31320/jenkins-docker-casc:v1
+docker build -t 192.168.0.33:31320/jenkins-docker-casc:v1 .
+docker push 192.168.0.33:31320/jenkins-docker-casc:v1
 
 @REM Navigating to the "other" folder, in which the docker files for the jenkins agents
 @REM for the different applications are kept.
 @REM Building the dot net core jenkins agent dockerfile and pushing it to the registry.
 cd other/consoleapp
-docker build -t 192.168.1.157:31320/docker-agent-dnc:v1 - < dotnetcore.Dockerfile
-docker push 192.168.1.157:31320/docker-agent-dnc:v1
+docker build -t 192.168.0.33:31320/docker-agent-dnc:v1 - < dotnetcore.Dockerfile
+docker push 192.168.0.33:31320/docker-agent-dnc:v1
 cd ..\..
 
 @REM Building the maven jdk jenkins agent docker file and pushing it to the registry.
 cd other/petclinic
-docker build -t 192.168.1.157:31320/docker-agent-mavenjdk:v1 .
-docker push 192.168.1.157:31320/docker-agent-mavenjdk:v1
+docker build -t 192.168.0.33:31320/docker-agent-mavenjdk:v1 .
+docker push 192.168.0.33:31320/docker-agent-mavenjdk:v1
 cd ..\..
 
 @REM Config maps and secrets that are referenced in deployment which contain the

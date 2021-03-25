@@ -5,8 +5,8 @@ ECHO OFF
 
 @REM Couldn't use "- < mavenjdkagent.Dockerfile" as the "ADD" command
 @REM wouldn't find the directory to copy from. --no-cache
-docker build --no-cache -t 192.168.1.157:31320/jenkins-docker-casc:v1 .
-docker push 192.168.1.157:31320/jenkins-docker-casc:v1
+docker build --no-cache -t 192.168.0.33:31320/jenkins-docker-casc:v1 .
+docker push 192.168.0.33:31320/jenkins-docker-casc:v1
 
 @REM docker run -d --name testcontainer localhost:5000/docker-agent-mavenjdk:v1
 

@@ -92,7 +92,7 @@ data:
       clouds:
         - kubernetes:
             name: "kubernetes"
-            serverUrl: "https://192.168.1.157:8443"
+            serverUrl: "https://192.168.0.33:8443"
             namespace: "jenkins"
             # This and below are refering to the service name 'jenkins'.
             jenkinsUrl: "http://jenkins/"
@@ -148,7 +148,7 @@ data:
                 nodeUsageMode: EXCLUSIVE
                 containers:
                   - name: "jnlp"
-                    image: "192.168.1.157:31320/docker-agent-dnc:v1" #jenkins/inbound-agent:latest
+                    image: "192.168.0.33:31320/docker-agent-dnc:v1" #jenkins/inbound-agent:latest
                     alwaysPullImage: true
                     workingDir: "/home/jenkins"
                     ttyEnabled: true
@@ -171,7 +171,7 @@ data:
                 nodeUsageMode: EXCLUSIVE
                 containers:
                   - name: "jnlp"
-                    image: "192.168.1.157:31320/docker-agent-mavenjdk:v1"
+                    image: "192.168.0.33:31320/docker-agent-mavenjdk:v1"
                     alwaysPullImage: true
                     # This needs to be a path other than the jenkins home in the image
                     # otherwise the mounting erases the local maven repo contents.
@@ -226,61 +226,7 @@ data:
         #         activeDeadlineSeconds: "120"
         #         slaveConnectTimeout: "1000"
 
-        - docker:
-            name: "docker-agent"
-            exposeDockerHost: true
-            dockerApi:
-              dockerHost:
-                # This is where the docker API is exposed on the host.
-                uri: "tcp://host.docker.internal:2375"
-            templates:
-              # Label that will be used to specify which job runs on this type of agent.
-              - labelString: "docker"
-                dockerTemplateBase:
-                  image: "jenkins/jenkins:lts"
-                  # attaching volumes to use docker inside this docker provisioned agent.
-                  volumes:
-                    - //var/run/docker.sock:/var/run/docker.sock
-                    - //usr/local/bin/docker:/usr/local/bin/docker
-                # Root file directory on the container agent.
-                remoteFs: "/var/jenkins_home"
-                connector:
-                  attach:
-                    user: "jenkins"
-                instanceCapStr: "10"
-                retentionStrategy:
-                  idleMinutes: 1
-
-              - labelString: "docker-dotnetcore"
-                dockerTemplateBase:
-                  # Note that to enable use of a local registry you need to add the
-                  # registry to the docker "daemon.json" file, as below:
-                  # insecure-registries": ["192.168.1.172:5000"]
-                  image: "192.168.1.172:5000/docker-agent-dnc:v1"
-                # Root file directory on the container agent.
-                remoteFs: "/var/jenkins_home"
-                connector:
-                  attach:
-                    user: "jenkins"
-                instanceCapStr: "10"
-                retentionStrategy:
-                  idleMinutes: 1
-
-              - labelString: "docker-mavenjdk"
-                dockerTemplateBase:
-                  image: "192.168.1.172:5000/docker-agent-mavenjdk:v1"
-                  # # Add volume for maven dependencies, which could be added by a jenkins
-                  # # job to download them preiodically?
-                  # volumes:
-                  #   - /.......:/var/jenkins_home/.m2/repository ?????
-                # Root file directory on the container agent.
-                remoteFs: "/var/jenkins_home"
-                connector:
-                  attach:
-                    user: "jenkins"
-                instanceCapStr: "10"
-                retentionStrategy:
-                  idleMinutes: 1
+        
 
     # example jenkins cloud config for reference
     # jenkins:
@@ -340,7 +286,7 @@ data:
                 scm:
                   git:
                     id: "pipeline-shared-lib"
-                    remote: "https://github.com/whayward-stfc/jenkins-bestpractice-config.git"
+                    remote: "https://github.com/mhdk/jenkins-bestpractice-config.git"
                     # credentialsId: "a-credential"
                     traits:
                       - "gitHubBranchDiscovery"
@@ -363,7 +309,7 @@ data:
               scm {
                   git {
                       remote {
-                          url('https://github.com/whayward-stfc/jenkins-bestpractice-config')
+                          url('https://github.com/mhdk/jenkins-bestpractice-config')
                       }
                       branch('master')
                   }

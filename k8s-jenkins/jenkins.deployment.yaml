@@ -29,7 +29,7 @@ spec:
       - name: jenkins
         # Using jenkins image from local repository. Needed to add the Repo IP to
         # "Insecure Repositories" in "~/.minikube/machines/<PROFILE_NAME>/config.json".
-        image: 192.168.1.157:31320/jenkins-docker-casc:v1 #jenkins/jenkins:lts-alpine
+        image: 192.168.0.33:31320/jenkins-docker-casc:v1 #jenkins/jenkins:lts-alpine
         imagePullPolicy: Always #IfNotPresent
         env:
         - name: JAVA_OPTS
